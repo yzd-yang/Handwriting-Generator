@@ -1,0 +1,452 @@
+<!DOCTYPE html><html class="dark" lang="zh-CN" style=""><head><link class="" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>Authentic Script Engine - Handwriting Generator</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Manrope:wght@400;600;700&amp;family=JetBrains+Mono:wght@500&amp;display=swap" rel="stylesheet">
+<script>
+  tailwind.config = {
+    darkMode: "class",
+    theme: {
+      extend: {
+        "colors": {
+                "on-primary": "#213337",
+                "on-error-container": "#ffdad6",
+                "on-surface-variant": "#c2c7c9",
+                "primary-fixed": "#d2e6eb",
+                "surface-container-lowest": "#0d0e0f",
+                "on-tertiary-fixed-variant": "#394856",
+                "error": "#ffb4ab",
+                "on-tertiary": "#23323f",
+                "on-tertiary-container": "#556473",
+                "surface-container-highest": "#343535",
+                "on-tertiary-fixed": "#0d1d29",
+                "background": "#131314",
+                "tertiary-fixed-dim": "#b8c8d9",
+                "inverse-surface": "#e4e2e2",
+                "inverse-primary": "#4f6166",
+                "primary-fixed-dim": "#b6cacf",
+                "surface": "#131314",
+                "outline": "#8c9293",
+                "error-container": "#93000a",
+                "secondary-fixed-dim": "#cdc1e1",
+                "surface-dim": "#131314",
+                "on-secondary-fixed": "#1e182f",
+                "outline-variant": "#424849",
+                "surface-container-high": "#292a2a",
+                "surface-container": "#1f2020",
+                "secondary-fixed": "#e9ddfe",
+                "on-secondary-container": "#beb3d3",
+                "on-primary-fixed-variant": "#384a4e",
+                "on-secondary": "#342c45",
+                "surface-tint": "#b6cacf",
+                "on-primary-container": "#53666a",
+                "inverse-on-surface": "#303031",
+                "tertiary": "#fbfcff",
+                "primary": "#f7fdff",
+                "tertiary-container": "#d1e1f3",
+                "on-surface": "#e4e2e2",
+                "surface-variant": "#343535",
+                "on-error": "#690005",
+                "secondary-container": "#4d455f",
+                "primary-container": "#cfe3e8",
+                "on-primary-fixed": "#0b1e22",
+                "on-secondary-fixed-variant": "#4a435d",
+                "secondary": "#cdc1e1",
+                "surface-bright": "#393939",
+                "tertiary-fixed": "#d4e4f6",
+                "on-background": "#e4e2e2",
+                "surface-container-low": "#1b1c1c"
+        },
+        "borderRadius": {
+                "DEFAULT": "0.25rem",
+                "lg": "0.5rem",
+                "xl": "0.75rem",
+                "full": "9999px",
+                "custom": "0.5rem"
+        },
+        "spacing": {
+                "container-max": "1280px",
+                "margin-desktop": "64px",
+                "margin-mobile": "16px",
+                "unit": "8px",
+                "gutter": "24px"
+        },
+        "fontFamily": {
+                "headline-lg-mobile": [
+                        "manrope", "sans-serif"
+                ],
+                "body-md": [
+                        "inter", "sans-serif"
+                ],
+                "body-lg": [
+                        "inter", "sans-serif"
+                ],
+                "headline-md": [
+                        "manrope", "sans-serif"
+                ],
+                "label-md": [
+                        "jetbrains Mono", "monospace"
+                ],
+                "headline-lg": [
+                        "manrope", "sans-serif"
+                ],
+                "display-lg": [
+                        "manrope", "sans-serif"
+                ]
+        },
+        "fontSize": {
+                "headline-lg-mobile": [
+                        "28px",
+                        {
+                                "lineHeight": "36px",
+                                "fontWeight": "600"
+                        }
+                ],
+                "body-md": [
+                        "16px",
+                        {
+                                "lineHeight": "24px",
+                                "fontWeight": "400"
+                        }
+                ],
+                "body-lg": [
+                        "18px",
+                        {
+                                "lineHeight": "28px",
+                                "fontWeight": "400"
+                        }
+                ],
+                "headline-md": [
+                        "24px",
+                        {
+                                "lineHeight": "32px",
+                                "fontWeight": "600"
+                        }
+                ],
+                "label-md": [
+                        "14px",
+                        {
+                                "lineHeight": "20px",
+                                "letterSpacing": "0.05em",
+                                "fontWeight": "500"
+                        }
+                ],
+                "headline-lg": [
+                        "32px",
+                        {
+                                "lineHeight": "40px",
+                                "fontWeight": "600"
+                        }
+                ],
+                "display-lg": [
+                        "48px",
+                        {
+                                "lineHeight": "56px",
+                                "letterSpacing": "-0.02em",
+                                "fontWeight": "700"
+                        }
+                ]
+        }
+},
+    },
+  }
+</script>
+<style data-purpose="custom-utilities">
+    /* Hide number input spinners for cleaner UI */
+    input[type=number]::-webkit-inner-spin-button, 
+    input[type=number]::-webkit-outer-spin-button { 
+      -webkit-appearance: none; 
+      margin: 0; 
+    }
+    input[type=number] {
+      -moz-appearance: textfield;
+    }
+    
+    .card-section {
+      @apply bg-black/20 backdrop-blur-sm p-4 rounded-custom border border-white/10 mb-4 shadow-sm;
+    }
+    .input-group {
+      @apply flex items-center justify-between mb-3 text-sm;
+    }
+    .input-label {
+      @apply text-gray-200 whitespace-nowrap mr-3;
+    }
+    .input-field {
+      @apply border-white/20 bg-black/30 text-white rounded-custom focus:ring-[#CFE3E8] focus:border-[#CFE3E8] text-sm px-3 py-1.5 w-24 text-right;
+    }
+    .btn-outline {
+      @apply border border-white/20 text-white px-3 py-1.5 rounded-custom hover:bg-white/10 transition-colors text-sm;
+    }
+    .btn-primary {
+      @apply bg-gradient-to-r from-[#9E94B2] to-[#CFE3E8] text-[#000D19] px-4 py-2 rounded-custom hover:opacity-90 transition-colors font-semibold shadow-sm text-sm;
+    }
+    .btn-secondary {
+      @apply bg-black/40 text-white px-4 py-2 rounded-custom hover:bg-black/60 transition-colors font-medium shadow-sm text-sm border border-white/10;
+    }
+    .btn-info {
+      @apply bg-[#000D19] text-white px-4 py-2 rounded-custom hover:opacity-90 transition-colors font-medium shadow-sm text-sm border border-white/20;
+    }
+    
+    .custom-scrollbar::-webkit-scrollbar {
+      width: 8px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-track {
+      @apply bg-black/10;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+      @apply bg-white/20 rounded-full;
+    }
+  </style>
+</head>
+<body class="bg-gradient-to-b from-[#000D19] via-[#9E94B2] to-[#CFE3E8] text-white antialiased h-screen flex overflow-hidden font-body-md">
+<!-- BEGIN: Main Layout -->
+<div class="flex w-full h-full p-4 gap-6">
+<!-- BEGIN: Left Column - Configuration Form -->
+<div class="w-full md:w-1/2 lg:w-5/12 xl:w-1/3 h-full flex flex-col bg-black/30 backdrop-blur-md rounded-custom shadow-xl border border-white/10 overflow-hidden" data-purpose="config-panel">
+<!-- Scrollable Content Area -->
+<div class="flex-1 overflow-y-auto p-4 custom-scrollbar">
+<!-- BEGIN: Text & File Input Section -->
+<section class="card-section">
+<h3 class="text-sm font-semibold mb-3 text-white border-b border-white/10 pb-2 font-headline-md">文本内容</h3>
+<div class="mb-3">
+<label class="block text-sm text-gray-200 mb-1">文字：</label>
+<div class="w-full border border-white/20 rounded-custom overflow-hidden flex flex-col bg-black/30 shadow-sm">
+<!-- Toolbar -->
+<div class="flex flex-wrap items-center gap-1 p-1.5 border-b border-white/10 bg-black/20">
+<button class="p-1 hover:bg-white/10 rounded transition-colors text-gray-300" title="Bold">
+<span class="material-symbols-outlined text-sm">format_bold</span>
+</button>
+<button class="p-1 hover:bg-white/10 rounded transition-colors text-gray-300" title="Italic">
+<span class="material-symbols-outlined text-sm">format_italic</span>
+</button>
+<button class="p-1 hover:bg-white/10 rounded transition-colors text-gray-300" title="Underline">
+<span class="material-symbols-outlined text-sm">format_underlined</span>
+</button>
+<div class="w-px h-4 bg-white/20 mx-1"></div>
+<button class="p-1 hover:bg-white/10 rounded transition-colors text-gray-300" title="Bullet List">
+<span class="material-symbols-outlined text-sm">format_list_bulleted</span>
+</button>
+<button class="p-1 hover:bg-white/10 rounded transition-colors text-gray-300" title="Ordered List">
+<span class="material-symbols-outlined text-sm">format_list_numbered</span>
+</button>
+<div class="w-px h-4 bg-white/20 mx-1"></div>
+<button class="p-1 hover:bg-white/10 rounded transition-colors text-gray-300" title="Text Color">
+<span class="material-symbols-outlined text-sm">format_color_text</span>
+</button>
+</div>
+<!-- Editor Area -->
+<div class="p-3 min-h-[200px] text-sm focus:outline-none cursor-text text-white bg-white/5 border border-white/10 focus:ring-1 focus:ring-[#CFE3E8] focus:border-[#CFE3E8]" placeholder="123123">
+    123123
+  </div>
+</div>
+</div>
+<div class="text-center text-sm text-gray-300 mb-3">或者上传一个文档文件：</div>
+<div class="flex justify-center mb-4">
+<button class="btn-primary py-1.5 px-3">选择文件</button>
+</div>
+<div class="mb-3 flex items-center justify-between">
+<label class="input-label">字体文件：</label>
+<div class="flex gap-2 w-full justify-end">
+<button class="btn-primary py-1.5 px-3 whitespace-nowrap">选择文件</button>
+<select class="border-white/20 rounded-custom focus:ring-[#CFE3E8] focus:border-[#CFE3E8] text-sm flex-1 text-white appearance-none text-center bg-white/5 border-white/10">
+<option></option>
+<!-- Options would go here -->
+</select>
+</div>
+</div>
+<div class="flex items-center justify-between">
+<label class="input-label">背景图片文件：</label>
+<button class="bg-black/20 text-gray-400 px-3 py-1.5 rounded-custom hover:bg-black/30 transition-colors text-sm cursor-not-allowed border border-white/10" disabled="">选择文件</button>
+</div>
+</section>
+<!-- END: Text & File Input Section -->
+<!-- BEGIN: Page Layout Section -->
+<section class="card-section">
+<h3 class="text-sm font-semibold mb-3 text-white border-b border-white/10 pb-2 font-headline-md">页面布局</h3>
+<div class="flex gap-4 mb-3">
+<div class="flex-1 flex items-center justify-between">
+<label class="input-label">宽度：</label>
+<input class="input-field w-20 bg-white/5 border-white/10 focus:ring-1 focus:ring-[#CFE3E8] focus:border-[#CFE3E8] text-[#f7fdff]" type="number" value="2481">
+</div>
+<div class="flex-1 flex items-center justify-between">
+<label class="input-label">高度：</label>
+<input class="input-field w-20 bg-white/5 border-white/10 focus:ring-1 focus:ring-[#CFE3E8] focus:border-[#CFE3E8] text-[#f7fdff]" type="number" value="3507">
+</div>
+<button class="bg-black/20 border border-white/10 rounded px-2 hover:bg-white/10 text-white">×</button>
+</div>
+<div class="input-group">
+<label class="input-label">模板：</label>
+<div class="flex gap-1 border border-white/20 rounded-custom overflow-hidden bg-black/30">
+<button class="px-3 py-1 text-xs hover:bg-white/10 bg-white/10 text-white border border-[#CFE3E8]/50 shadow-sm rounded m-0.5">空白</button>
+<button class="px-3 py-1 text-xs hover:bg-white/10 text-gray-300">单线</button>
+<button class="px-3 py-1 text-xs hover:bg-white/10 text-gray-300">方格</button>
+<button class="px-3 py-1 text-xs hover:bg-white/10 text-gray-300">点阵</button>
+</div>
+</div>
+<div class="input-group">
+<label class="input-label">颜色：</label>
+<div class="flex gap-1">
+<button class="w-6 h-6 rounded border border-white/20 bg-white"></button>
+<button class="w-6 h-6 rounded border border-white/20 bg-[#f5e6d3]"></button>
+<button class="w-6 h-6 rounded border border-white/20 bg-[#e6f0fa]"></button>
+<button class="w-6 h-6 rounded border border-white/20 bg-gray-300"></button>
+<button class="w-6 h-6 rounded border border-white/20 bg-black"></button>
+<button class="w-6 h-6 rounded border border-white/20 bg-[#e8daef]"></button>
+</div>
+</div>
+<div class="input-group">
+<label class="input-label">纸张：</label>
+<div class="flex gap-1 border border-white/20 rounded-custom p-0.5 bg-black/30">
+<button class="px-2 py-0.5 text-xs hover:bg-white/10 bg-white/10 text-white shadow-sm border border-white/10 rounded">A4</button>
+<button class="px-2 py-0.5 text-xs hover:bg-white/10 text-gray-300 rounded">A5</button>
+<button class="px-2 py-0.5 text-xs hover:bg-white/10 text-gray-300 rounded">B5</button>
+<button class="px-2 py-0.5 text-xs hover:bg-white/10 text-gray-300 rounded">Letter</button>
+</div>
+</div>
+<div class="flex items-center justify-end mb-4">
+<input class="rounded text-[#CFE3E8] focus:ring-[#CFE3E8] mr-2 border-white/20 bg-black/30" id="increase-spacing" type="checkbox">
+<label class="text-sm text-gray-200 cursor-pointer" for="increase-spacing">增大英文单词间距</label>
+</div>
+<div class="input-group">
+<label class="input-label">段落对齐：</label>
+<select class="border-white/20 text-white rounded-custom focus:ring-[#CFE3E8] focus:border-[#CFE3E8] text-sm flex-1 bg-white/5 border-white/10">
+<option>默认 (左对齐)</option>
+</select>
+</div>
+<div class="grid grid-cols-2 gap-x-4 gap-y-3">
+<div class="flex items-center justify-between col-span-2">
+<label class="input-label">首行缩进（字）：</label>
+<input class="input-field bg-white/5 border-white/10 focus:ring-1 focus:ring-[#CFE3E8] focus:border-[#CFE3E8] text-[#f7fdff]" type="number" value="2">
+</div>
+<div class="flex items-center justify-between col-span-2">
+<label class="input-label">段间距（行）：</label>
+<input class="input-field bg-white/5 border-white/10 focus:ring-1 focus:ring-[#CFE3E8] focus:border-[#CFE3E8] text-[#f7fdff]" type="number" value="0">
+</div>
+<!-- Splitting into two columns for compact layout -->
+<div class="flex flex-col gap-3">
+<div class="flex items-center justify-between">
+<label class="input-label">字体大小：</label>
+<input class="input-field w-16 bg-white/5 border-white/10 focus:ring-1 focus:ring-[#CFE3E8] focus:border-[#CFE3E8] text-[#f7fdff]" type="number" value="124">
+</div>
+<div class="flex items-center justify-between">
+<label class="input-label">行间距：</label>
+<input class="input-field w-16 bg-white/5 border-white/10 focus:ring-1 focus:ring-[#CFE3E8] focus:border-[#CFE3E8] text-[#f7fdff]" type="number" value="200">
+</div>
+<div class="flex items-center justify-between">
+<label class="input-label">上边距：</label>
+<input class="input-field w-16 bg-white/5 border-white/10 focus:ring-1 focus:ring-[#CFE3E8] focus:border-[#CFE3E8] text-[#f7fdff]" type="number" value="50">
+</div>
+<div class="flex items-center justify-between">
+<label class="input-label">下边距：</label>
+<input class="input-field w-16 bg-white/5 border-white/10 focus:ring-1 focus:ring-[#CFE3E8] focus:border-[#CFE3E8] text-[#f7fdff]" type="number" value="50">
+</div>
+</div>
+<div class="flex flex-col gap-3">
+<div class="flex items-center justify-between">
+<label class="input-label">左边距：</label>
+<input class="input-field w-16 bg-white/5 border-white/10 focus:ring-1 focus:ring-[#CFE3E8] focus:border-[#CFE3E8] text-[#f7fdff]" type="number" value="50">
+</div>
+<div class="flex items-center justify-between">
+<label class="input-label">右边距：</label>
+<input class="input-field w-16 bg-white/5 border-white/10 focus:ring-1 focus:ring-[#CFE3E8] focus:border-[#CFE3E8] text-[#f7fdff]" type="number" value="50">
+</div>
+</div>
+</div>
+</section>
+<!-- END: Page Layout Section -->
+<!-- BEGIN: Advanced Perturbations Section -->
+<section class="card-section border-white/10 bg-white/5">
+<div class="flex justify-center mb-4">
+<button class="bg-white/10 text-white px-6 py-1.5 rounded-custom text-sm hover:bg-white/20 shadow-sm border border-white/10">更多内容</button>
+</div>
+<div class="space-y-3">
+<div class="flex items-center justify-between">
+<label class="input-label">行间距扰动：</label>
+<input class="input-field bg-white/5 border-white/10 focus:ring-1 focus:ring-[#CFE3E8] focus:border-[#CFE3E8] text-[#f7fdff]" type="number" value="0">
+</div>
+<div class="flex items-center justify-between">
+<label class="input-label">字体大小扰动：</label>
+<input class="input-field bg-white/5 border-white/10 focus:ring-1 focus:ring-[#CFE3E8] focus:border-[#CFE3E8] text-[#f7fdff]" type="number" value="2">
+</div>
+<div class="flex items-center justify-between">
+<label class="input-label">字间距扰动：</label>
+<input class="input-field bg-white/5 border-white/10 focus:ring-1 focus:ring-[#CFE3E8] focus:border-[#CFE3E8] text-[#f7fdff]" type="number" value="2">
+</div>
+<div class="flex items-center justify-between">
+<label class="input-label">笔画横向偏移：</label>
+<input class="input-field bg-white/5 border-white/10 focus:ring-1 focus:ring-[#CFE3E8] focus:border-[#CFE3E8] text-[#f7fdff]" type="number" value="3">
+</div>
+<div class="flex items-center justify-between">
+<label class="input-label">笔画纵向偏移：</label>
+<input class="input-field bg-white/5 border-white/10 focus:ring-1 focus:ring-[#CFE3E8] focus:border-[#CFE3E8] text-[#f7fdff]" type="number" value="3">
+</div>
+<div class="flex items-center justify-between">
+<label class="input-label">笔画旋转偏移：</label>
+<input class="input-field bg-white/5 border-white/10 focus:ring-1 focus:ring-[#CFE3E8] focus:border-[#CFE3E8] text-[#f7fdff]" step="0.01" type="number" value="0.05">
+</div>
+<div class="flex items-center justify-between">
+<label class="input-label">字间距：</label>
+<input class="input-field bg-white/5 border-white/10 focus:ring-1 focus:ring-[#CFE3E8] focus:border-[#CFE3E8] text-[#f7fdff]" type="number" value="1">
+</div>
+<div class="border-t border-white/10 pt-3 mt-3">
+<div class="flex items-center justify-between mb-3">
+<label class="input-label text-xs text-gray-300">涂改线长度的标准差：</label>
+<input class="input-field w-16 h-7 text-xs bg-white/5 border-white/10 focus:ring-1 focus:ring-[#CFE3E8] focus:border-[#CFE3E8] text-[#f7fdff]" type="number" value="2">
+</div>
+<div class="flex items-center justify-between mb-3">
+<label class="input-label text-xs text-gray-300">涂改线角度的标准差：</label>
+<input class="input-field w-16 h-7 text-xs bg-white/5 border-white/10 focus:ring-1 focus:ring-[#CFE3E8] focus:border-[#CFE3E8] text-[#f7fdff]" type="number" value="2">
+</div>
+<div class="flex items-center justify-between mb-3">
+<label class="input-label text-xs text-gray-300">涂改线宽度的标准差：</label>
+<input class="input-field w-16 h-7 text-xs bg-white/5 border-white/10 focus:ring-1 focus:ring-[#CFE3E8] focus:border-[#CFE3E8] text-[#f7fdff]" type="number" value="2">
+</div>
+</div>
+<div class="flex items-center justify-between">
+<label class="input-label">涂改出现的几率：</label>
+<input class="input-field bg-white/5 border-white/10 focus:ring-1 focus:ring-[#CFE3E8] focus:border-[#CFE3E8] text-[#f7fdff]" step="0.001" type="number" value="0.005">
+</div>
+<div class="flex items-center justify-between">
+<label class="input-label">涂改线宽度：</label>
+<input class="input-field bg-white/5 border-white/10 focus:ring-1 focus:ring-[#CFE3E8] focus:border-[#CFE3E8] text-[#f7fdff]" type="number" value="8">
+</div>
+<div class="flex items-center justify-between">
+<label class="input-label">墨汁深度标准差：</label>
+<input class="input-field bg-white/5 border-white/10 focus:ring-1 focus:ring-[#CFE3E8] focus:border-[#CFE3E8] text-[#f7fdff]" type="number" value="30">
+</div>
+</div>
+</section>
+<!-- END: Advanced Perturbations Section -->
+</div>
+<!-- BEGIN: Action Buttons -->
+<div class="p-3 bg-black/20 border-t border-white/10 shrink-0">
+<div class="flex flex-wrap gap-2 justify-center"><button class="flex-1 sm:flex-none px-4 py-2 rounded-lg bg-white/10 backdrop-blur-sm border border-white/10 text-white text-sm font-medium transition-all hover:bg-white/20 hover:border-white/20 hover:scale-[1.02]">载入设置</button><button class="flex-1 sm:flex-none px-4 py-2 rounded-lg bg-white/10 backdrop-blur-sm border border-white/10 text-white text-sm font-medium transition-all hover:bg-white/20 hover:border-white/20 hover:scale-[1.02]">保存设置</button><button class="flex-1 sm:flex-none px-4 py-2 rounded-lg bg-white/10 backdrop-blur-sm border border-white/10 text-white text-sm font-medium transition-all hover:bg-white/20 hover:border-white/20 hover:scale-[1.02]">重置设置</button><button class="flex-1 sm:flex-none px-4 py-2 rounded-lg bg-gradient-to-r from-[#9E94B2] to-[#CFE3E8] text-[#000D19] text-sm font-bold shadow-lg transition-all hover:opacity-90 hover:scale-[1.02]">预览</button><button class="w-full sm:w-auto px-4 py-2 rounded-lg bg-gradient-to-r from-[#9E94B2] to-[#CFE3E8] text-[#000D19] text-sm font-bold shadow-lg transition-all hover:opacity-90 hover:scale-[1.02]">生成完整手写图片</button><button class="w-full sm:w-auto px-4 py-2 rounded-lg bg-gradient-to-r from-[#9E94B2] to-[#CFE3E8] text-[#000D19] text-sm font-bold shadow-lg transition-all hover:opacity-90 hover:scale-[1.02]">生成pdf</button><button class="w-full sm:w-auto px-4 py-2 rounded-lg bg-black/40 backdrop-blur-sm border border-white/20 text-white text-sm font-medium transition-all hover:bg-black/60 hover:scale-[1.02]">反馈</button></div>
+</div>
+<!-- END: Action Buttons -->
+</div>
+<!-- END: Left Column - Configuration Form -->
+<!-- BEGIN: Right Column - Live Preview -->
+<div class="hidden md:flex flex-1 flex-col bg-black/30 backdrop-blur-md rounded-custom shadow-xl border border-white/10 p-6" data-purpose="preview-panel">
+<div class="text-center mb-6">
+<h2 class="text-3xl font-bold text-white tracking-wide font-headline-lg drop-shadow-md">预览：</h2>
+</div>
+<div class="flex-1 flex items-center justify-center bg-black/20 rounded-lg border-2 border-dashed border-white/20 overflow-hidden relative backdrop-blur-sm">
+<!-- Preview Placeholder mimicking the provided image -->
+<div class="w-full max-w-2xl aspect-[3/4] bg-white flex items-center justify-center shadow-2xl relative rounded-sm">
+<img alt="Handwriting Preview" class="object-contain w-full h-full p-4 mix-blend-multiply opacity-80" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA1vRDZs_SVONEX_9K56QEV3-U4H0oV3DqaxbI_m6G8TLPVS6W7pOZKJDBoeu93OLeKV9ttptaYR6Ygfjnez-m2puNwyrT10EQQGX-iUah33pC8U6LI8SQFhIyzDxsit4J1ggYUbgYjNpAJLFhXFX8h1JxkJv5TTOnPLERwzez0x99g9yzGWZFyZZVgE7UenxmRRiA3n6StuqfOf29XE2jh21hjLq4J-CdL3FcIrkeEF4gdeBPH3xJ-5nlEr7SPRjDGnlfFvsYAwBU">
+<!-- Absolute positioned overlay to mimic the large icon in screenshot if needed, but placeholder is cleaner -->
+<div class="absolute inset-0 flex items-center justify-center opacity-40 pointer-events-none">
+<svg class="text-gray-800" fill="none" height="300" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1" viewBox="0 0 24 24" width="300" xmlns="http://www.w3.org/2000/svg"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
+</div>
+</div>
+</div>
+</div>
+<!-- END: Right Column - Live Preview -->
+</div>
+<!-- END: Main Layout -->
+
+
+
+
+</body></html>
