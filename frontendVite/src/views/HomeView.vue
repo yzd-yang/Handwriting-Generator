@@ -14,24 +14,24 @@
           </div>
           <div class="text-center text-sm text-gray-300 mb-3">或者上传一个文档文件：</div>
           <div class="flex justify-center mb-3">
-            <button @click="triggerTextFileInput" class="btn-primary py-1 px-3">选择文件</button>
-            <input type="file" ref="textFileInput" @change="uploadTextFile" accept=".doc,.docx,.pdf,.txt,.rtf" class="hidden" />
+            <button class="btn-primary py-1 px-3" @click="triggerTextFileInput">选择文件</button>
+            <input ref="textFileInput" type="file" accept=".doc,.docx,.pdf,.txt,.rtf" class="hidden" @change="uploadTextFile" />
           </div>
           <div class="mb-3 flex items-center justify-between">
             <label class="input-label">字体文件：</label>
             <div class="flex gap-2 w-full justify-end">
-              <button @click="triggerFontFileInput" class="btn-primary py-1 px-3 whitespace-nowrap">选择文件</button>
-              <input type="file" ref="fontFileInput" @change="onFontChange" class="hidden" />
+              <button class="btn-primary py-1 px-3 whitespace-nowrap" @click="triggerFontFileInput">选择文件</button>
+              <input ref="fontFileInput" type="file" class="hidden" @change="onFontChange" />
               <select v-model="selectedOption" class="border-white/20 rounded-custom focus:ring-[#CFE3E8] focus:border-[#CFE3E8] text-sm flex-1 text-white appearance-none text-center bg-white/5 border">
-                <option v-for="option in options" :value="option.value" :key="option.value">{{ option.text }}</option>
+                <option v-for="option in options" :key="option.value" :value="option.value">{{ option.text }}</option>
               </select>
             </div>
           </div>
           <div class="flex items-center justify-between">
             <label class="input-label">背景图片文件：</label>
             <div class="flex gap-2 items-center">
-              <button @click="triggerImageFileInput" :class="isDimensionSpecified ? 'bg-black/20 text-gray-400 cursor-not-allowed' : 'btn-primary'" :disabled="isDimensionSpecified" class="py-1 px-3">选择文件</button>
-              <input type="file" ref="imageFileInput" @change="onBackgroundImageChange" class="hidden" />
+              <button :class="isDimensionSpecified ? 'bg-black/20 text-gray-400 cursor-not-allowed' : 'btn-primary'" :disabled="isDimensionSpecified" class="py-1 px-3" @click="triggerImageFileInput">选择文件</button>
+              <input ref="imageFileInput" type="file" class="hidden" @change="onBackgroundImageChange" />
               <span v-if="selectedImageFileName" class="text-xs text-gray-300 max-w-[100px] truncate">{{ selectedImageFileName }}</span>
             </div>
           </div>
@@ -49,31 +49,34 @@
               <label class="input-label">高度：</label>
               <input v-model="height" type="number" class="input-field w-16 bg-white/5 border-white/10 focus:ring-1 focus:ring-[#CFE3E8] focus:border-[#CFE3E8] text-[#f7fdff]" :disabled="isBackgroundImageSpecified">
             </div>
-            <button @click="clearDimensions" class="bg-black/20 border border-white/10 rounded px-2 hover:bg-white/10 text-white text-sm">×</button>
+            <button class="bg-black/20 border border-white/10 rounded px-2 hover:bg-white/10 text-white text-sm" @click="clearDimensions">×</button>
           </div>
           <div class="input-group">
             <label class="input-label">模板：</label>
             <div class="flex gap-1 border border-white/20 rounded-custom overflow-hidden bg-black/30">
-              <button v-for="pt in paperTypes" :key="pt.value" @click="paperType = pt.value"
-                :class="paperType === pt.value ? 'bg-white/10 text-white border border-[#CFE3E8]/50 shadow-sm' : 'text-gray-300 hover:bg-white/10'"
-                class="px-2 py-0.5 text-xs rounded m-0.5">{{ pt.label }}</button>
+              <button
+v-for="pt in paperTypes" :key="pt.value" :class="paperType === pt.value ? 'bg-white/10 text-white border border-[#CFE3E8]/50 shadow-sm' : 'text-gray-300 hover:bg-white/10'"
+                class="px-2 py-0.5 text-xs rounded m-0.5"
+                @click="paperType = pt.value">{{ pt.label }}</button>
             </div>
           </div>
           <div class="input-group">
             <label class="input-label">颜色：</label>
             <div class="flex gap-2 items-center flex-wrap">
-              <button v-for="c in colorPresets" :key="c" @click="paperColor = c"
-                :class="paperColor === c ? 'ring-2 ring-[#CFE3E8] ring-offset-1 ring-offset-black/50 scale-110' : 'border-white/20 hover:scale-105'"
-                class="w-7 h-7 rounded-md border transition-all" :style="{ backgroundColor: c }"></button>
-              <input type="color" v-model="paperColor" class="w-7 h-7 cursor-pointer rounded-md border border-white/20" title="自定义颜色">
+              <button
+v-for="c in colorPresets" :key="c" :class="paperColor === c ? 'ring-2 ring-[#CFE3E8] ring-offset-1 ring-offset-black/50 scale-110' : 'border-white/20 hover:scale-105'"
+                class="w-7 h-7 rounded-md border transition-all"
+                :style="{ backgroundColor: c }" @click="paperColor = c"></button>
+              <input v-model="paperColor" type="color" class="w-7 h-7 cursor-pointer rounded-md border border-white/20" title="自定义颜色">
             </div>
           </div>
           <div class="input-group">
             <label class="input-label">纸张：</label>
             <div class="flex gap-1 border border-white/20 rounded-custom p-0.5 bg-black/30">
-              <button v-for="p in paperPresets" :key="p.name" @click="applyPaperPreset(p)"
-                :class="width === p.width && height === p.height ? 'bg-white/10 text-white shadow-sm border border-white/10' : 'text-gray-300 hover:bg-white/10'"
-                class="px-2 py-0.5 text-xs rounded">{{ p.name }}</button>
+              <button
+v-for="p in paperPresets" :key="p.name" :class="width === p.width && height === p.height ? 'bg-white/10 text-white shadow-sm border border-white/10' : 'text-gray-300 hover:bg-white/10'"
+                class="px-2 py-0.5 text-xs rounded"
+                @click="applyPaperPreset(p)">{{ p.name }}</button>
             </div>
           </div>
           <div class="flex items-center justify-end mb-3">
@@ -119,7 +122,7 @@
         <!-- Advanced Perturbations Section -->
         <section class="card-section border-white/10 bg-white/5">
           <div class="flex justify-center mb-3">
-            <button @click="isExpanded = !isExpanded" class="bg-white/10 text-white px-4 py-1 rounded-custom text-xs hover:bg-white/20 shadow-sm border border-white/10">
+            <button class="bg-white/10 text-white px-4 py-1 rounded-custom text-xs hover:bg-white/20 shadow-sm border border-white/10" @click="isExpanded = !isExpanded">
               {{ isExpanded ? '收起' : '更多内容' }}
             </button>
           </div>
@@ -185,16 +188,16 @@
       <!-- Action Buttons -->
       <div class="p-2 bg-black/20 border-t border-white/10 shrink-0">
         <div class="flex flex-wrap gap-1.5 justify-center">
-          <button @click="loadPreset" class="px-3 py-1.5 rounded-lg bg-white/10 backdrop-blur-sm border border-white/10 text-white text-xs font-medium transition-all hover:bg-white/20">载入</button>
-          <button @click="savePreset" class="px-3 py-1.5 rounded-lg bg-white/10 backdrop-blur-sm border border-white/10 text-white text-xs font-medium transition-all hover:bg-white/20">保存</button>
-          <button @click="resetSettings" class="px-3 py-1.5 rounded-lg bg-white/10 backdrop-blur-sm border border-white/10 text-white text-xs font-medium transition-all hover:bg-white/20">重置</button>
-          <button @click="generateHandwriting(true)" :disabled="shouldDisableButtons" class="px-3 py-1.5 rounded-lg bg-gradient-to-r from-[#9E94B2] to-[#CFE3E8] text-[#000D19] text-xs font-bold shadow-lg transition-all hover:opacity-90 disabled:opacity-50">
+          <button class="px-3 py-1.5 rounded-lg bg-white/10 backdrop-blur-sm border border-white/10 text-white text-xs font-medium transition-all hover:bg-white/20" @click="loadPreset">载入</button>
+          <button class="px-3 py-1.5 rounded-lg bg-white/10 backdrop-blur-sm border border-white/10 text-white text-xs font-medium transition-all hover:bg-white/20" @click="savePreset">保存</button>
+          <button class="px-3 py-1.5 rounded-lg bg-white/10 backdrop-blur-sm border border-white/10 text-white text-xs font-medium transition-all hover:bg-white/20" @click="resetSettings">重置</button>
+          <button :disabled="shouldDisableButtons" class="px-3 py-1.5 rounded-lg bg-gradient-to-r from-[#9E94B2] to-[#CFE3E8] text-[#000D19] text-xs font-bold shadow-lg transition-all hover:opacity-90 disabled:opacity-50" @click="generateHandwriting(true)">
             {{ buttonText || '预览' }}
           </button>
-          <button @click="generateHandwriting(false)" :disabled="shouldDisableButtons" class="px-3 py-1.5 rounded-lg bg-gradient-to-r from-[#9E94B2] to-[#CFE3E8] text-[#000D19] text-xs font-bold shadow-lg transition-all hover:opacity-90 disabled:opacity-50">
+          <button :disabled="shouldDisableButtons" class="px-3 py-1.5 rounded-lg bg-gradient-to-r from-[#9E94B2] to-[#CFE3E8] text-[#000D19] text-xs font-bold shadow-lg transition-all hover:opacity-90 disabled:opacity-50" @click="generateHandwriting(false)">
             {{ buttonText || '生成图片' }}
           </button>
-          <button @click="generateHandwriting(false, true)" :disabled="shouldDisableButtons" class="px-3 py-1.5 rounded-lg bg-gradient-to-r from-[#9E94B2] to-[#CFE3E8] text-[#000D19] text-xs font-bold shadow-lg transition-all hover:opacity-90 disabled:opacity-50">
+          <button :disabled="shouldDisableButtons" class="px-3 py-1.5 rounded-lg bg-gradient-to-r from-[#9E94B2] to-[#CFE3E8] text-[#000D19] text-xs font-bold shadow-lg transition-all hover:opacity-90 disabled:opacity-50" @click="generateHandwriting(false, true)">
             {{ buttonText || '生成PDF' }}
           </button>
           <router-link to="/Feedback" class="px-3 py-1.5 rounded-lg bg-black/40 backdrop-blur-sm border border-white/20 text-white text-xs font-medium transition-all hover:bg-black/60 text-center">反馈</router-link>
@@ -221,9 +224,9 @@
         </div>
       </div>
       <div v-if="previewImages && previewImages.length > 1" class="flex justify-center items-center gap-3 mt-3">
-        <button @click="prevPage" :disabled="currentPreviewIndex === 0" class="btn-outline text-xs py-1 px-2 disabled:opacity-50">上一页</button>
+        <button :disabled="currentPreviewIndex === 0" class="btn-outline text-xs py-1 px-2 disabled:opacity-50" @click="prevPage">上一页</button>
         <span class="text-xs text-gray-300">{{ currentPreviewIndex + 1 }} / {{ previewImages.length }}</span>
-        <button @click="nextPage" :disabled="currentPreviewIndex === previewImages.length - 1" class="btn-outline text-xs py-1 px-2 disabled:opacity-50">下一页</button>
+        <button :disabled="currentPreviewIndex === previewImages.length - 1" class="btn-outline text-xs py-1 px-2 disabled:opacity-50" @click="nextPage">下一页</button>
       </div>
     </div>
   </div>
@@ -300,6 +303,7 @@ export default {
     paperType(newVal) { localStorage.setItem('paperType', JSON.stringify(newVal)); this.isUnderlined = (newVal === 'lines' || newVal === 'grid') },
     paperColor(newVal) { localStorage.setItem('paperColor', JSON.stringify(newVal)) }
   },
+  beforeUnmount() { if (this.cooldownTimer) clearInterval(this.cooldownTimer); if (this.queueFullTimer) clearInterval(this.queueFullTimer) },
   methods: {
     prevPage() { if (this.currentPreviewIndex > 0) this.currentPreviewIndex-- },
     nextPage() { if (this.currentPreviewIndex < this.previewImages.length - 1) this.currentPreviewIndex++ },
@@ -354,24 +358,24 @@ export default {
     },
     htmlToPlainText(html) {
       if (!html) return ''
-      const tmp = document.createElement('div')
-      tmp.innerHTML = html
-      tmp.querySelectorAll('br').forEach(br => br.replaceWith('\n'))
-      tmp.querySelectorAll('p').forEach(el => {
+      // 用 DOMParser 替代 innerHTML，避免 XSS（不执行 script）
+      const doc = new DOMParser().parseFromString(html, 'text/html')
+      doc.querySelectorAll('br').forEach(br => br.replaceWith('\n'))
+      doc.querySelectorAll('p').forEach(el => {
         el.insertAdjacentText('afterend', '\n\n')
       })
-      tmp.querySelectorAll('div, li').forEach(el => {
+      doc.querySelectorAll('div, li').forEach(el => {
         el.insertAdjacentText('afterend', '\n')
       })
-      let text = tmp.textContent || ''
+      let text = doc.body?.textContent || ''
       text = text.replace(/\n{3,}/g, '\n\n')
       return text.trim()
     },
     extractAlignmentFromHtml(html) {
       if (!html) return 'default'
-      const tmp = document.createElement('div')
-      tmp.innerHTML = html
-      const firstP = tmp.querySelector('p')
+      // 用 DOMParser 替代 innerHTML，避免 XSS
+      const doc = new DOMParser().parseFromString(html, 'text/html')
+      const firstP = doc.querySelector('p')
       if (!firstP) return 'default'
       const style = firstP.getAttribute('style') || ''
       const alignMatch = style.match(/text-align:\s*(left|center|right|justify)/)
@@ -450,7 +454,7 @@ export default {
             this.updateTaskUploadMessage(data, taskId)
             if (data?.task_status === 'completed') { if (isSettled) return; isSettled = true; clearTimeout(timeoutId); socket.close(); resolve() }
             else if (data?.task_status === 'failed') { if (isSettled) return; isSettled = true; clearTimeout(timeoutId); socket.close(); reject(new Error(data?.error_message || '任务失败')) }
-          } catch (e) {}
+          } catch (e) { console.error('[HomeView] WebSocket 消息解析失败:', e, 'raw=', event.data) }
         }
         socket.onerror = () => { if (isSettled) return; isSettled = true; clearTimeout(timeoutId); reject(new Error('WebSocket连接失败')) }
         socket.onclose = () => { if (isSettled) return; isSettled = true; clearTimeout(timeoutId); reject(new Error('WebSocket已关闭')) }
@@ -498,7 +502,6 @@ export default {
       this.queueFullTotal = seconds; this.queueFullCountdown = seconds
       this.queueFullTimer = setInterval(() => { this.queueFullCountdown -= 1; if (this.queueFullCountdown <= 0) { this.queueFullCountdown = 0; clearInterval(this.queueFullTimer); this.queueFullTimer = null } }, 1000)
     }
-  },
-  beforeUnmount() { if (this.cooldownTimer) clearInterval(this.cooldownTimer); if (this.queueFullTimer) clearInterval(this.queueFullTimer) }
+  }
 }
 </script>

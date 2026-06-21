@@ -9,8 +9,8 @@
         <p class="text-sm text-gray-300">将此应用添加到主屏幕，获得更好的使用体验</p>
       </div>
       <div class="flex gap-2">
-        <button @click="installApp" class="btn-primary px-4 py-2">安装</button>
-        <button @click="dismissPrompt" class="btn-secondary px-4 py-2">稍后</button>
+        <button class="btn-primary px-4 py-2" @click="installApp">安装</button>
+        <button class="btn-secondary px-4 py-2" @click="dismissPrompt">稍后</button>
       </div>
     </div>
   </div>

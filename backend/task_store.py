@@ -28,13 +28,21 @@ _write_lock = Lock()
 
 # DB 列定义，顺序即 INSERT 顺序
 _COLUMNS = [
-    "task_id", "status", "stage", "message", "progress",
-    "created_at", "updated_at",
-    "response_status_code", "response_content_type", "response_headers",
-    "result_file_path", "error_message",
+    "task_id",
+    "status",
+    "stage",
+    "message",
+    "progress",
+    "created_at",
+    "updated_at",
+    "response_status_code",
+    "response_content_type",
+    "response_headers",
+    "result_file_path",
+    "error_message",
 ]
 
-_CREATE_TABLE_SQL = f"""
+_CREATE_TABLE_SQL = """
 CREATE TABLE IF NOT EXISTS generation_tasks (
     task_id             TEXT PRIMARY KEY,
     status              TEXT NOT NULL DEFAULT 'pending',
@@ -59,6 +67,7 @@ _CREATE_INDEXES_SQL = [
 
 # ── 连接管理 ────────────────────────────────────────────────────────
 
+
 def _connect() -> sqlite3.Connection:
     conn = sqlite3.connect(str(_DB_PATH), timeout=_DB_TIMEOUT)
     conn.execute("PRAGMA journal_mode=WAL")
@@ -68,6 +77,7 @@ def _connect() -> sqlite3.Connection:
 
 
 # ── 初始化 ──────────────────────────────────────────────────────────
+
 
 def init():
     """应用启动时调用，确保表和目录存在。"""
@@ -82,10 +92,8 @@ def init():
         conn.close()
 
 
-init()
-
-
 # ── 行 ↔ dict 转换 ────────────────────────────────────────────────
+
 
 def _row_to_task(row: sqlite3.Row | None) -> Optional[GenerationTask]:
     if row is None:
@@ -116,6 +124,7 @@ def _serialize_updates(updates: dict[str, Any]) -> dict[str, Any]:
 
 # ── 磁盘文件操作 ────────────────────────────────────────────────────
 
+
 def _write_result_file(task_id: str, data: bytes) -> str:
     """将 response_body 写入磁盘，返回文件绝对路径。"""
     task_dir = _RESULT_DIR / task_id
@@ -142,12 +151,14 @@ def _remove_result_dir(task_id: str):
     if task_dir.exists():
         try:
             import shutil
+
             shutil.rmtree(task_dir, ignore_errors=True)
         except Exception as e:
             logger.warning("Failed to remove result dir %s: %s", task_dir, e)
 
 
 # ── 公开 API ────────────────────────────────────────────────────────
+
 
 def set_task(task_id: str, **updates: Any) -> GenerationTask:
     """写入/更新任务。若传入 response_body（bytes），自动存磁盘。"""
@@ -163,9 +174,7 @@ def set_task(task_id: str, **updates: Any) -> GenerationTask:
         conn = _connect()
         try:
             # INSERT OR REPLACE — 一条 SQL 搞定 upsert
-            row = conn.execute(
-                "SELECT task_id FROM generation_tasks WHERE task_id = ?", (task_id,)
-            ).fetchone()
+            row = conn.execute("SELECT task_id FROM generation_tasks WHERE task_id = ?", (task_id,)).fetchone()
 
             if row is not None:
                 # UPDATE：只更新传入的字段
@@ -179,11 +188,16 @@ def set_task(task_id: str, **updates: Any) -> GenerationTask:
                 # INSERT：补齐所有列的默认值
                 defaults: dict[str, Any] = {
                     "task_id": task_id,
-                    "status": "pending", "stage": "", "message": "",
-                    "progress": 0, "created_at": updates["updated_at"],
+                    "status": "pending",
+                    "stage": "",
+                    "message": "",
+                    "progress": 0,
+                    "created_at": updates["updated_at"],
                     "updated_at": updates["updated_at"],
-                    "response_status_code": None, "response_content_type": None,
-                    "response_headers": "{}", "result_file_path": None,
+                    "response_status_code": None,
+                    "response_content_type": None,
+                    "response_headers": "{}",
+                    "result_file_path": None,
                     "error_message": "",
                 }
                 defaults.update(updates)
@@ -194,11 +208,7 @@ def set_task(task_id: str, **updates: Any) -> GenerationTask:
                 )
             conn.commit()
 
-            return _row_to_task(
-                conn.execute(
-                    "SELECT * FROM generation_tasks WHERE task_id = ?", (task_id,)
-                ).fetchone()
-            )
+            return _row_to_task(conn.execute("SELECT * FROM generation_tasks WHERE task_id = ?", (task_id,)).fetchone())
         finally:
             conn.close()
 
@@ -207,11 +217,7 @@ def get_task(task_id: str) -> Optional[GenerationTask]:
     """读取任务（纯读操作，不需要写锁）。"""
     conn = _connect()
     try:
-        return _row_to_task(
-            conn.execute(
-                "SELECT * FROM generation_tasks WHERE task_id = ?", (task_id,)
-            ).fetchone()
-        )
+        return _row_to_task(conn.execute("SELECT * FROM generation_tasks WHERE task_id = ?", (task_id,)).fetchone())
     finally:
         conn.close()
 
@@ -221,11 +227,7 @@ def pop_task(task_id: str) -> Optional[GenerationTask]:
     with _write_lock:
         conn = _connect()
         try:
-            task = _row_to_task(
-                conn.execute(
-                    "SELECT * FROM generation_tasks WHERE task_id = ?", (task_id,)
-                ).fetchone()
-            )
+            task = _row_to_task(conn.execute("SELECT * FROM generation_tasks WHERE task_id = ?", (task_id,)).fetchone())
             if task is not None:
                 conn.execute("DELETE FROM generation_tasks WHERE task_id = ?", (task_id,))
                 conn.commit()
@@ -247,16 +249,14 @@ def cleanup_expired():
             ).fetchall()
             for row in expired:
                 _remove_result_dir(row["task_id"])
-            conn.execute(
-                "DELETE FROM generation_tasks WHERE updated_at < ?", (cutoff,)
-            )
+            conn.execute("DELETE FROM generation_tasks WHERE updated_at < ?", (cutoff,))
             conn.commit()
         finally:
             conn.close()
 
 
 def get_queue_metrics(task_id: str) -> dict[str, int]:
-    """获取排队位置信息。"""
+    """获取排队位置信息（优化：用 1 条 SQL 拿 pending + processing 计数）。"""
     conn = _connect()
     try:
         task = conn.execute(
@@ -264,15 +264,17 @@ def get_queue_metrics(task_id: str) -> dict[str, int]:
             (task_id,),
         ).fetchone()
         if task is None:
-            return {"queue_pending_count": 0, "queue_ahead_count": 0,
-                    "processing_count": 0, "active_task_count": 0}
+            return {"queue_pending_count": 0, "queue_ahead_count": 0, "processing_count": 0, "active_task_count": 0}
 
-        pending = conn.execute(
-            "SELECT COUNT(*) FROM generation_tasks WHERE status = 'pending'"
-        ).fetchone()[0]
-        processing = conn.execute(
-            "SELECT COUNT(*) FROM generation_tasks WHERE status = 'processing'"
-        ).fetchone()[0]
+        # 1 条 SQL 同时拿 pending 和 processing 计数
+        counts = conn.execute("""SELECT
+                   SUM(CASE WHEN status = 'pending' THEN 1 ELSE 0 END) AS pending,
+                   SUM(CASE WHEN status = 'processing' THEN 1 ELSE 0 END) AS processing
+               FROM generation_tasks
+               WHERE status IN ('pending', 'processing')""").fetchone()
+        pending = counts[0] or 0
+        processing = counts[1] or 0
+
         ahead = 0
         if task["status"] == "pending":
             created = task["created_at"] or 0
@@ -296,9 +298,7 @@ def get_active_task_count() -> int:
     """返回当前 pending + processing 的任务总数（不依赖 task_id）。"""
     conn = _connect()
     try:
-        row = conn.execute(
-            "SELECT COUNT(*) FROM generation_tasks WHERE status IN ('pending', 'processing')"
-        ).fetchone()
+        row = conn.execute("SELECT COUNT(*) FROM generation_tasks WHERE status IN ('pending', 'processing')").fetchone()
         return row[0] if row else 0
     finally:
         conn.close()

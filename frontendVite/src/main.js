@@ -12,19 +12,25 @@ import http from './utils/http'
 const app = createApp(App)
 const head = createHead()
 
-Sentry.init({
-  app,
-  dsn: 'https://507b601bbd374cf58b7c5468cb434578@o4505255803551744.ingest.sentry.io/4505485557891072',
-  integrations: [
-    Sentry.browserTracingIntegration({
-      tracePropagationTargets: ['localhost', /^https:\/\/yourserver\.io\/api/]
-    }),
-    Sentry.replayIntegration()
-  ],
-  tracesSampleRate: 1.0,
-  replaysSessionSampleRate: 0.1,
-  replaysOnErrorSampleRate: 1.0
-})
+// Sentry 错误监控：仅当配置了 DSN 时启用
+const sentry_dsn = import.meta.env.VITE_SENTRY_DSN || ''
+if (sentry_dsn) {
+  Sentry.init({
+    app,
+    dsn: sentry_dsn,
+    integrations: [
+      Sentry.browserTracingIntegration({
+        tracePropagationTargets: ['localhost', /^https:\/\/yourserver\.io\/api/]
+      }),
+      Sentry.replayIntegration()
+    ],
+    tracesSampleRate: Number(import.meta.env.VITE_SENTRY_TRACES_SAMPLE_RATE || 0.1),
+    replaysSessionSampleRate: 0.1,
+    replaysOnErrorSampleRate: 1.0
+  })
+} else {
+  console.warn('Sentry DSN 未配置，错误上报已禁用')
+}
 
 app.use(store)
 app.use(router)
@@ -36,24 +42,30 @@ app.config.globalProperties.$swal = Swal
 
 app.mount('#app')
 
-// Google Analytics
-const gaScript = document.createElement('script')
-gaScript.async = true
-gaScript.src = 'https://www.googletagmanager.com/gtag/js?id=G-GB1XG89B6Z'
-document.head.appendChild(gaScript)
-
-gaScript.onload = () => {
-  window.dataLayer = window.dataLayer || []
-  function gtag() { window.dataLayer.push(arguments) }
-  gtag('js', new Date())
-  gtag('config', 'G-GB1XG89B6Z')
+// Google Analytics（仅生产环境 + 配置了 ID 时注入）
+const isProd = import.meta.env.PROD
+const gaId = import.meta.env.VITE_GA_ID || ''
+if (isProd && gaId) {
+  const gaScript = document.createElement('script')
+  gaScript.async = true
+  gaScript.src = `https://www.googletagmanager.com/gtag/js?id=${gaId}`
+  document.head.appendChild(gaScript)
+  gaScript.onload = () => {
+    window.dataLayer = window.dataLayer || []
+    function gtag() { window.dataLayer.push(arguments) }
+    gtag('js', new Date())
+    gtag('config', gaId)
+  }
 }
 
-// Microsoft Clarity
-const clarityScript = document.createElement('script')
-clarityScript.async = true
-clarityScript.src = 'https://www.clarity.ms/tag/ounxp8da5s'
-document.head.appendChild(clarityScript)
+// Microsoft Clarity（仅生产环境 + 配置了 ID 时注入）
+const clarityId = import.meta.env.VITE_CLARITY_ID || ''
+if (isProd && clarityId) {
+  const clarityScript = document.createElement('script')
+  clarityScript.async = true
+  clarityScript.src = `https://www.clarity.ms/tag/${clarityId}`
+  document.head.appendChild(clarityScript)
+}
 
 // Service Worker
 if ('serviceWorker' in navigator) {

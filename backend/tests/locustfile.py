@@ -7,9 +7,7 @@ Locust 压测脚本 - 手写生成后端并发测试
 """
 
 import random
-import os
-from locust import HttpUser, task, between, events
-from locust.runners import MasterRunner
+from locust import HttpUser, task, between
 
 
 class HandwritingUser(HttpUser):
@@ -81,6 +79,7 @@ class HandwritingUser(HttpUser):
 
         # Step 2: 轮询任务状态
         import time
+
         deadline = time.time() + 120
         poll_interval = 1.0
         task_status = None

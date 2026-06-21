@@ -21,6 +21,7 @@ class GenerationTask(TypedDict, total=False):
 
 class GenerateHandwritingParams(BaseModel):
     """手写生成请求参数，文件和表单字段合一。"""
+
     # 表单字段
     text: str
     font_size: str
@@ -52,9 +53,9 @@ class GenerateHandwritingParams(BaseModel):
     pdf_save: str = "false"
     full_preview: str = "true"
     # 段落排版（新增，均有默认值，向后兼容老请求）
-    paragraph_layout: str = "default"      # default | center | right 全篇段落对齐方式
-    first_line_indent: str = "2"           # 首行缩进字符数（0=不缩进）
-    paragraph_spacing: str = "0"           # 段间距（段间额外空行数）
+    paragraph_layout: str = "default"  # default | center | right 全篇段落对齐方式
+    first_line_indent: str = "2"  # 首行缩进字符数（0=不缩进）
+    paragraph_spacing: str = "0"  # 段间距（段间额外空行数）
 
     # 纸张模板（新增，带默认值，向后兼容老请求）
     # paper_type: blank（空白）| lines（单线，默认）| grid（方格）| dots（点阵）
@@ -96,11 +97,13 @@ def form_dependency_from_model(model_cls: type[BaseModel]):
     sig = inspect.signature(_as_form)
     new_params = []
     for name, (annotation, default) in fields.items():
-        new_params.append(inspect.Parameter(
-            name,
-            inspect.Parameter.POSITIONAL_OR_KEYWORD,
-            default=default,
-            annotation=annotation,
-        ))
+        new_params.append(
+            inspect.Parameter(
+                name,
+                inspect.Parameter.POSITIONAL_OR_KEYWORD,
+                default=default,
+                annotation=annotation,
+            )
+        )
     _as_form.__signature__ = sig.replace(parameters=new_params)
     return _as_form

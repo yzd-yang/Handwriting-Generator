@@ -158,9 +158,7 @@ def test_generate_handwriting_concurrency():
         pytest.fail("HANDWRITING_LOAD_REQUESTS should be >= 4 to cover the 3+ requests scenario.")
 
     try:
-        status_code, _, fonts = http_json(
-            "GET", f"{base_url}/api/fonts_info", data=None, timeout=20.0
-        )
+        status_code, _, fonts = http_json("GET", f"{base_url}/api/fonts_info", data=None, timeout=20.0)
     except Exception as e:
         pytest.fail(f"Failed to connect backend at {base_url}: {e}")
 

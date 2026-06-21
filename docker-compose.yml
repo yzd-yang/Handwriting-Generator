@@ -1,6 +1,10 @@
+version: "3.9"
+
 services:
   frontend:
-    image: frontend-handwriting:latest
+    build:
+      context: ./frontendVite
+      dockerfile: Dockerfile
     labels:
       - com.centurylinklabs.watchtower.enable=true
     ports:
@@ -13,20 +17,26 @@ services:
     mem_limit: 800m
     memswap_limit: 1600m
 
-
   backend:
-    image: backend-handwriting:latest
+    build:
+      context: .
+      dockerfile: backend/dockerfile.backend
     labels:
       - com.centurylinklabs.watchtower.enable=true
     ports:
       - "127.0.0.1:5005:5005"
-    # 启动时同步字体文件到指定文件夹，如果直接将字体文件夹挂载到容器中，会默认同步宿主机的空文件导致被覆盖
     environment:
       - FONT_ASSETS_DIR=/app/font_assets_host
       - FONT_ASSETS_BUNDLED_DIR=/app/font_assets
+      - LOG_LEVEL=${LOG_LEVEL:-INFO}
+      - MAX_UPLOAD_MB=${MAX_UPLOAD_MB:-20}
     volumes:
       - ./ttf_files:/app/font_assets_host
       - ./logs:/app/logs
+      - type: bind
+        source: ./backend/tasks.db
+        target: /app/backend/tasks.db
+        read_only: false
     cpu_count: 1
     cpu_quota: 80000
     cpu_period: 100000
@@ -41,5 +51,3 @@ services:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
     command: --label-enable --cleanup --rolling-restart --schedule "0 0 */6 * * *"
- 
-

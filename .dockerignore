@@ -1,0 +1,45 @@
+**
+
+# 依赖目录（前端 + 后端）
+**/node_modules
+**/venv
+**/__pycache__
+*.pyc
+*.pyo
+
+# 构建产物
+**/dist
+**/build
+**/.next
+**/.nuxt
+
+# git
+.git
+.gitignore
+
+# 临时文件
+**/temp
+**/textfileprocess
+**/imagefileprocess
+**/output
+**/*.log
+**/*.db
+**/*.db-journal
+**/logs
+**/pandoc-*.msi
+
+# IDE
+.vscode
+.idea
+*.swp
+*.swo
+
+# 工作区工具
+.mimocode
+.opencode
+.workbuddy
+.anydev
+
+# OS
+.DS_Store
+Thumbs.db

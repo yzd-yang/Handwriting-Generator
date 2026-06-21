@@ -24,26 +24,6 @@ const routes = [
     }
   },
   {
-    path: '/Login',
-    name: 'Login',
-    component: () => import('../views/UserLogin.vue'),
-    meta: {
-      title: '登录 - 手写文字生成网站',
-      description: '登录您的账户以使用更多功能。',
-      robots: 'noindex, nofollow'
-    }
-  },
-  {
-    path: '/Register',
-    name: 'Register',
-    component: () => import('../views/UserRegister.vue'),
-    meta: {
-      title: '注册 - 手写文字生成网站',
-      description: '注册账户，开始生成个性化手写图片与 PDF。',
-      robots: 'noindex, nofollow'
-    }
-  },
-  {
     path: '/Feedback',
     name: 'Feedback',
     component: () => import('../components/UserFeedback.vue'),

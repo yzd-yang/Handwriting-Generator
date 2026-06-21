@@ -1,5 +1,5 @@
 module.exports = {
-  branches: ["main"], // 指定要发布的分支 (通常是 main 或 master)
+  branches: ["master"], // 与实际主分支名一致
   plugins: [
     "@semantic-release/commit-analyzer", // 分析提交信息，确定版本更新类型（major/minor/patch）
     "@semantic-release/release-notes-generator", // 根据提交生成 changelog

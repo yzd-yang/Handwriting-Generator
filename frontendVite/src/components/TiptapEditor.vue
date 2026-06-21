@@ -1,33 +1,33 @@
 <template>
   <div class="tiptap-editor flex flex-col">
     <div class="flex flex-wrap items-center gap-1 p-1.5 border-b border-white/10 bg-black/20 shrink-0">
-      <button @click="editor?.chain().focus().toggleBold().run()" :class="{ 'bg-white/10': editor?.isActive('bold') }" class="p-1 hover:bg-white/10 rounded transition-colors text-gray-300" title="粗体">
+      <button :class="{ 'bg-white/10': editor?.isActive('bold') }" class="p-1 hover:bg-white/10 rounded transition-colors text-gray-300" title="粗体" @click="editor?.chain().focus().toggleBold().run()">
         <span class="material-symbols-outlined text-base">format_bold</span>
       </button>
-      <button @click="editor?.chain().focus().toggleItalic().run()" :class="{ 'bg-white/10': editor?.isActive('italic') }" class="p-1 hover:bg-white/10 rounded transition-colors text-gray-300" title="斜体">
+      <button :class="{ 'bg-white/10': editor?.isActive('italic') }" class="p-1 hover:bg-white/10 rounded transition-colors text-gray-300" title="斜体" @click="editor?.chain().focus().toggleItalic().run()">
         <span class="material-symbols-outlined text-base">format_italic</span>
       </button>
-      <button @click="editor?.chain().focus().toggleUnderline().run()" :class="{ 'bg-white/10': editor?.isActive('underline') }" class="p-1 hover:bg-white/10 rounded transition-colors text-gray-300" title="下划线">
+      <button :class="{ 'bg-white/10': editor?.isActive('underline') }" class="p-1 hover:bg-white/10 rounded transition-colors text-gray-300" title="下划线" @click="editor?.chain().focus().toggleUnderline().run()">
         <span class="material-symbols-outlined text-base">format_underlined</span>
       </button>
       <div class="w-px h-4 bg-white/20 mx-1"></div>
-      <button @click="editor?.chain().focus().toggleBulletList().run()" :class="{ 'bg-white/10': editor?.isActive('bulletList') }" class="p-1 hover:bg-white/10 rounded transition-colors text-gray-300" title="无序列表">
+      <button :class="{ 'bg-white/10': editor?.isActive('bulletList') }" class="p-1 hover:bg-white/10 rounded transition-colors text-gray-300" title="无序列表" @click="editor?.chain().focus().toggleBulletList().run()">
         <span class="material-symbols-outlined text-base">format_list_bulleted</span>
       </button>
-      <button @click="editor?.chain().focus().toggleOrderedList().run()" :class="{ 'bg-white/10': editor?.isActive('orderedList') }" class="p-1 hover:bg-white/10 rounded transition-colors text-gray-300" title="有序列表">
+      <button :class="{ 'bg-white/10': editor?.isActive('orderedList') }" class="p-1 hover:bg-white/10 rounded transition-colors text-gray-300" title="有序列表" @click="editor?.chain().focus().toggleOrderedList().run()">
         <span class="material-symbols-outlined text-base">format_list_numbered</span>
       </button>
       <div class="w-px h-4 bg-white/20 mx-1"></div>
-      <button @click="editor?.chain().focus().setTextAlign('left').run()" :class="{ 'bg-white/10': editor?.isActive({ textAlign: 'left' }) }" class="p-1 hover:bg-white/10 rounded transition-colors text-gray-300" title="左对齐">
+      <button :class="{ 'bg-white/10': editor?.isActive({ textAlign: 'left' }) }" class="p-1 hover:bg-white/10 rounded transition-colors text-gray-300" title="左对齐" @click="editor?.chain().focus().setTextAlign('left').run()">
         <span class="material-symbols-outlined text-base">format_align_left</span>
       </button>
-      <button @click="editor?.chain().focus().setTextAlign('center').run()" :class="{ 'bg-white/10': editor?.isActive({ textAlign: 'center' }) }" class="p-1 hover:bg-white/10 rounded transition-colors text-gray-300" title="居中">
+      <button :class="{ 'bg-white/10': editor?.isActive({ textAlign: 'center' }) }" class="p-1 hover:bg-white/10 rounded transition-colors text-gray-300" title="居中" @click="editor?.chain().focus().setTextAlign('center').run()">
         <span class="material-symbols-outlined text-base">format_align_center</span>
       </button>
-      <button @click="editor?.chain().focus().setTextAlign('right').run()" :class="{ 'bg-white/10': editor?.isActive({ textAlign: 'right' }) }" class="p-1 hover:bg-white/10 rounded transition-colors text-gray-300" title="右对齐">
+      <button :class="{ 'bg-white/10': editor?.isActive({ textAlign: 'right' }) }" class="p-1 hover:bg-white/10 rounded transition-colors text-gray-300" title="右对齐" @click="editor?.chain().focus().setTextAlign('right').run()">
         <span class="material-symbols-outlined text-base">format_align_right</span>
       </button>
-      <button @click="editor?.chain().focus().setTextAlign('justify').run()" :class="{ 'bg-white/10': editor?.isActive({ textAlign: 'justify' }) }" class="p-1 hover:bg-white/10 rounded transition-colors text-gray-300" title="两端对齐">
+      <button :class="{ 'bg-white/10': editor?.isActive({ textAlign: 'justify' }) }" class="p-1 hover:bg-white/10 rounded transition-colors text-gray-300" title="两端对齐" @click="editor?.chain().focus().setTextAlign('justify').run()">
         <span class="material-symbols-outlined text-base">format_align_justify</span>
       </button>
     </div>
