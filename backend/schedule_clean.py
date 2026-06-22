@@ -4,9 +4,11 @@ import shutil
 import os
 import threading
 
+from config import settings
+
 
 def clear_temp_dir():
-    temp_dir = "./temp"
+    temp_dir = settings.temp_dir
     if os.path.exists(temp_dir):
         for filename in os.listdir(temp_dir):
             file_path = os.path.join(temp_dir, filename)

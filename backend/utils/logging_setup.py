@@ -9,7 +9,10 @@
 """
 
 import logging
+import os
 from logging.handlers import RotatingFileHandler
+
+from config import settings
 
 
 def setup_logging(level: str = "INFO") -> logging.Logger:
@@ -39,8 +42,10 @@ def setup_logging(level: str = "INFO") -> logging.Logger:
     root.addHandler(ch)
 
     # 轮转文件 handler（10MB，保留最近 5 份）
+    # 使用 settings.log_dir 确保路径基于 app_root，而非 cwd
+    os.makedirs(settings.log_dir, exist_ok=True)
     fh = RotatingFileHandler(
-        "logs/app.log",
+        os.path.join(settings.log_dir, "app.log"),
         maxBytes=10 * 1024 * 1024,
         backupCount=5,
         encoding="utf-8",
@@ -55,8 +60,9 @@ def setup_logging(level: str = "INFO") -> logging.Logger:
 
     logger = logging.getLogger(__name__)
     logger.info(
-        "logging configured: level=%s, log_file=logs/app.log (10MB x 5)",
+        "logging configured: level=%s, log_file=%s (10MB x 5)",
         logging.getLevelName(log_level),
+        os.path.join(settings.log_dir, "app.log"),
     )
     return logger
 

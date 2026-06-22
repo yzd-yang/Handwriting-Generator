@@ -11,6 +11,7 @@ import shutil
 import time
 from pathlib import Path
 
+from config import settings
 from utils.logging_setup import get_logger
 
 logger = get_logger(__name__)
@@ -69,7 +70,7 @@ def safe_save_and_close_image(image, image_path):
 
 def cleanup_marked_directories():
     """清理项目内标记为稍后清理的目录"""
-    project_temp_base = "./temp"
+    project_temp_base = settings.temp_dir
 
     # 确保项目临时目录存在
     os.makedirs(project_temp_base, exist_ok=True)

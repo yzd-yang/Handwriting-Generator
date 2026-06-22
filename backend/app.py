@@ -26,9 +26,17 @@ from fastapi.responses import JSONResponse, Response
 load_dotenv()
 
 # 导入配置（敏感信息从环境变量读取，不得硬编码）
-from config import settings
+from config import settings, DATA_ROOT
 import os
 from contextlib import asynccontextmanager
+
+# 桌面模式：内嵌 pandoc 支持（必须在 pypandoc 使用前设置）
+# DATA_ROOT 在 PyInstaller 下指向 _internal/，开发模式下指向 backend/
+if settings.desktop_mode.lower() == "true":
+    _pandoc_path = os.path.join(DATA_ROOT, "pandoc", "pandoc.exe")
+    if os.path.isfile(_pandoc_path):
+        os.environ["PYPANDOC_PANDOC"] = _pandoc_path
+        print(f"Desktop mode: using bundled pandoc at {_pandoc_path}")
 
 from utils.logging_setup import setup_logging
 from uuid import uuid4
@@ -73,17 +81,14 @@ from task_types import (
 # 获取环境变量
 mysql_host = os.getenv("MYSQL_HOST", "db")
 enable_user_auth = os.getenv("ENABLE_USER_AUTH", "false")
-# 获取当前路径
-current_path = os.getcwd()
-# 创建一个子文件夹用于存储输出的图片
-output_path = os.path.join(current_path, "output")
-# 如果子文件夹不存在，就创建它
-if not os.path.exists(output_path):
-    os.makedirs(output_path)
-directory = ["./textfileprocess", "imagefileprocess"]
-for directory in directory:
-    if not os.path.exists(directory):
-        os.makedirs(directory)
+
+# 上传文件临时目录（使用 settings.upload_dir，避免 cwd 问题）
+upload_base = settings.upload_dir
+textfileprocess_dir = os.path.join(upload_base, "textfileprocess")
+imagefileprocess_dir = os.path.join(upload_base, "imagefileprocess")
+for d in [textfileprocess_dir, imagefileprocess_dir]:
+    if not os.path.exists(d):
+        os.makedirs(d, exist_ok=True)
 
 font_assets_dir = settings.font_assets_dir
 font_assets_bundled_dir = settings.font_assets_bundled_dir
@@ -129,12 +134,19 @@ async def lifespan(app: FastAPI):
     # 重新扫描字体文件列表（font_file_names 已移至 services.fonts）
 
     # 2. 确保 Pandoc 可用（import pypandoc 已在模块顶层完成）
+    # 桌面模式：绝不联网下载，缺了就报错
+    # 非桌面模式：缺了自动下载
     try:
         pypandoc.get_pandoc_version()
+        logger.info("Pandoc is available")
     except (OSError, RuntimeError):
-        logger.info("Pandoc not found, downloading...")
-        pypandoc.download_pandoc()
-        logger.info("Pandoc downloaded successfully.")
+        if settings.desktop_mode.lower() == "true":
+            logger.error("桌面模式缺少 pandoc，请检查打包。pandoc.exe 应位于 %s", os.path.join(DATA_ROOT, "pandoc", "pandoc.exe"))
+            # 桌面模式不下载，但也不强制崩溃——让接口在用时报错，方便用户排查
+        else:
+            logger.info("Pandoc not found, downloading...")
+            pypandoc.download_pandoc()
+            logger.info("Pandoc downloaded successfully.")
 
     # 3. 初始化任务数据库
     from task_store import init as init_task_store
@@ -438,7 +450,7 @@ async def textfileprocess(request: Request, file: UploadFile = File(...)):
         else:
             safe_name = f"{uuid4().hex}_{safe_name}"
         filename = safe_name
-        filepath = os.path.join(".", "textfileprocess", filename)  # 临时目录
+        filepath = os.path.join(textfileprocess_dir, filename)  # 临时目录
         content = await file.read()
         err = validate_upload(content, file.filename)
         if err:
@@ -476,7 +488,7 @@ async def imagefileprocess(request: Request, file: UploadFile = File(...)):
 
     if file and (file.filename.endswith(".jpg") or file.filename.endswith(".png") or file.filename.endswith(".jpeg")):
         filename = secure_filename(file.filename)
-        filepath = os.path.join("./imagefileprocess", filename)
+        filepath = os.path.join(imagefileprocess_dir, filename)
         content = await file.read()
         err = validate_upload(content, file.filename)
         if err:
@@ -692,6 +704,36 @@ async def after_request(request: Request, call_next):
     else:
         print(response)
         return response
+
+
+# ── 桌面模式：挂载前端静态文件 ──────────────────────────────────────────────────
+# 必须放在所有 API 路由之后，否则 catch-all 会吞掉 /api。
+# 通过环境变量 DESKTOP_MODE=true 启用（settings.desktop_mode）。
+
+if settings.desktop_mode.lower() == "true":
+    import os
+    from fastapi.staticfiles import StaticFiles
+    from fastapi.responses import FileResponse
+
+    _fe_dist = settings.frontend_dist
+    if os.path.isdir(_fe_dist):
+        # 挂载 /assets 静态目录（JS/CSS/图片等）
+        _assets_dir = os.path.join(_fe_dist, "assets")
+        if os.path.isdir(_assets_dir):
+            app.mount("/assets", StaticFiles(directory=_assets_dir), name="assets")
+
+        @app.get("/")
+        async def desktop_index():
+            """桌面模式：根路径返回前端 index.html"""
+            return FileResponse(os.path.join(_fe_dist, "index.html"))
+
+        @app.get("/{full_path:path}")
+        async def desktop_spa_fallback(full_path: str):
+            """SPA 历史模式回退：非 API 路径返回 index.html（或静态文件）。"""
+            candidate = os.path.join(_fe_dist, full_path)
+            if os.path.isfile(candidate):
+                return FileResponse(candidate)
+            return FileResponse(os.path.join(_fe_dist, "index.html"))
 
 
 if __name__ == "__main__":

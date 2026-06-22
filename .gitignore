@@ -49,12 +49,24 @@ backend/textfileprocess/
 backend/imagefileprocess/
 backend/output/
 backend/logs/
+backend/runtime/
+
+# Packaging (build artifacts only; scripts/specs are tracked)
+packaging/build/
+packaging/dist/
+packaging/build_venv/
+packaging/pandoc/
+pandoc-*.msi
+backend/pandoc-*.msi
 
 # Mimocode
 .mimocode/
 
 # OpenSpec
 openspec/
+
+# Ruff cache
+.ruff_cache/
 
 # OpenCode
 .opencode/

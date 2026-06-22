@@ -3,10 +3,12 @@ import tempfile
 import os
 import shutil
 
+from config import settings
+
 
 def generate_pdf(images):
     # 创建项目内的临时目录，避免使用系统临时目录
-    project_temp_base = "./temp"
+    project_temp_base = settings.temp_dir
     os.makedirs(project_temp_base, exist_ok=True)
     temp_dir = tempfile.mkdtemp(dir=project_temp_base)
     print("temp_dir", temp_dir)
@@ -33,9 +35,9 @@ def generate_pdf(images):
             rect = fitz.Rect(0, 0, width, height)
             # 插入图像到PDF页面
             pdf_page.insert_image(rect, filename=temp_img_path)
-        os.makedirs("./temp", exist_ok=True)
+        # 使用项目临时目录（已由 project_temp_base 确保存在）
         # 使用 NamedTemporaryFile 替代弃用的 mktemp
-        with tempfile.NamedTemporaryFile(suffix=".pdf", dir="./temp", delete=False) as f:
+        with tempfile.NamedTemporaryFile(suffix=".pdf", dir=project_temp_base, delete=False) as f:
             temp_pdf_file_path = f.name
 
         # 保存PDF文档到临时文件

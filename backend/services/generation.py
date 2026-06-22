@@ -37,6 +37,8 @@ from services.task_manager import (
 from task_store import set_task as set_generation_task
 from task_types import GenerateHandwritingParams
 
+from config import settings
+
 from utils.logging_setup import get_logger
 
 logger = get_logger(__name__)
@@ -260,11 +262,11 @@ def generate_handwriting_impl(
         report_progress("rendering", "正在生成手写图像", 45)
         images = handwrite(text_to_generate, template)
         logger.info("handwrite initial images generated successfully")
-        project_temp_base = "./temp"
+        project_temp_base = settings.temp_dir
         os.makedirs(project_temp_base, exist_ok=True)
         temp_dir = tempfile.mkdtemp(dir=project_temp_base)
         unique_filename = "images_" + str(time.time())
-        zip_path = f"./temp/{unique_filename}.zip"
+        zip_path = os.path.join(project_temp_base, f"{unique_filename}.zip")
         is_preview = data["preview"] == "true"
         full_preview = data.get("full_preview", "true") if is_preview else None
         if is_preview:
