@@ -76,7 +76,7 @@ if ('serviceWorker' in navigator) {
         if (reg.active?.scriptURL?.includes('sw.js')) await reg.unregister()
       }
       navigator.serviceWorker.addEventListener('controllerchange', () => {
-        if (confirm('网站已更新到新版本，点击确定刷新页面以加载最新内容。')) window.location.reload()
+        window.location.reload()
       })
     } catch (error) {
       console.error('[SW] 初始化失败:', error)

@@ -202,13 +202,14 @@ v-for="p in paperPresets" :key="p.name" :class="width === p.width && height === 
           </button>
           <div class="relative group">
             <button class="px-3 py-1.5 rounded-lg bg-black/40 backdrop-blur-sm border border-white/20 text-white text-xs font-medium transition-all hover:bg-black/60 text-center">支持</button>
-            <div class="absolute right-0 top-full mt-1 w-44 rounded-lg bg-black/80 backdrop-blur-md border border-white/20 shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-150 z-50 overflow-hidden">
-              <a href="https://github.com/yzd-yang/Handwriting-Generator" target="_blank" rel="noopener noreferrer" class="block px-4 py-2 text-xs text-white hover:bg-white/10 transition-colors">GitHub</a>
-              <a href="https://gitee.com/yzd01234657980/Handwriting-Generator" target="_blank" rel="noopener noreferrer" class="block px-4 py-2 text-xs text-white hover:bg-white/10 transition-colors">Gitee</a>
+            <div class="absolute right-0 bottom-full mb-1 w-44 rounded-lg bg-black/80 backdrop-blur-md border border-white/20 shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-150 z-50 overflow-hidden">
+              <a href="https://github.com/yzd-yang/Handwriting-Generator" target="_blank" rel="noopener noreferrer" class="block px-4 py-2 text-xs text-white hover:bg-white/10 transition-colors">GitHub  (国外访问)</a>
+              <a href="https://gitee.com/yzd01234657980/Handwriting-Generator" target="_blank" rel="noopener noreferrer" class="block px-4 py-2 text-xs text-white hover:bg-white/10 transition-colors">Gitee   (国内访问)</a>
               <div class="border-t border-white/10"></div>
               <p class="px-4 py-2 text-xs text-gray-400 leading-relaxed">本工具完全免费，如有付费请退款</p>
             </div>
           </div>
+          <p class="text-center text-gray-400 text-xs mt-3">本工具完全免费，如有付费请退款</p>
         </div>
       </div>
     </div>
